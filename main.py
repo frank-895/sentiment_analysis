@@ -3,6 +3,7 @@ from requests.auth import HTTPBasicAuth
 import os
 from dotenv import load_dotenv
 from vaderSentiment.vaderSentiment import SentimentIntensityAnalyzer
+from datetime import datetime
 
 def get_headers():
     """Retrieve Reddit API headers to access Reddit data."""
@@ -23,31 +24,53 @@ def get_headers():
     else:
         raise Exception("Failed to access redit API")      
 
-def retrieve_posts(n, company, start_date, end_date):
+def retrieve_posts(n, company):
+    """
+    Retrieves n reddit posts containing name of company from start_date to end_date. 
+    n should be integer between 1 and 100 (inclusive)
+    company should be string no greater than 15 characters
+    Dates should be supplied in format 'YYYY-MM-DD'
+    """
+    
+    # validate inputs
+    if (
+        type(n) != int or 
+        n <= 0 or 
+        n > 100 or
+        type(company) != str or 
+        len(company) > 15
+        ):
+        raise ValueError("Ensure inputs are correctly formatted.")
+    
     # Define variables
     url = "https://oauth.reddit.com/search"
     params = {
-        'q': company,
-        'limit': n,
-        'since': start_date,
-        'until': end_date
+        'q': company, # query
+        'limit': n, # number of queries
     }
-    headers = get_headers()
+    headers = get_headers() # get access to API
 
-    # request from reddit API
-    response = requests.get(url, headers=headers, params=params).json()
+    response = requests.get(url, headers=headers, params=params).json() # request from reddit API
 
-    post_info = []
+    post_info = [] # store info from each post
     for post in response['data']['children']: # returns info about each post requested
-        post_info.append(post['data']['title'] + post['data']['selftext'])
+        post_info.append(post['data']['title'] + post['data']['selftext']) # for each post gather its title and text for analysis
     return post_info
 
-def perform_sentiment_analysis():
-    pass
+def perform_sentiment_analysis(post:str):
+    """Performs sentiment analysis on 'post'"""
+    analyser = SentimentIntensityAnalyzer() # create analyser instance
+    sentiment = analyser.polarity_scores(post) # sentiment scores.
+    return sentiment['compound'] # compound is overall sentiment between -1 and 1. *note - possible to extract positive, negative and neutral scores too.
 
-posts_2023 = retrieve_posts(10, 'pepsi', '2023-01-01','2024-01-01')
-posts_2022 = retrieve_posts(10, 'pepsi', '2022-01-01','2023-01-01')
 
-analyser = SentimentIntensityAnalyzer() # create analyser instance
-for post in posts_2023:
-    print(analyser.polarity_scores(post))
+
+
+pepsi_posts = retrieve_posts(500, 'pepsi')
+
+pepsi_avg = 0
+for post in pepsi_posts:
+    pepsi_avg += perform_sentiment_analysis(post)
+pepsi_avg = pepsi_avg/len(pepsi_posts)
+
+print("pepsi average is: ", pepsi_avg)

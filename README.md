@@ -33,4 +33,4 @@ CLIENT_SECRET=your_client_secret
 Functions
 get_headers(): Retrieves the necessary headers for accessing the Reddit API.
 retrieve_posts(n, company, start_date, end_date): Fetches a specified number of Reddit posts mentioning a given company within a date range.
-perform_sentiment_analysis(): Placeholder function to perform sentiment analysis.
+perform_sentiment_analysis(): Placeholder function to perform sentiment analysis. We use the normalized, weighted composite score called 'compound' to judge the sentiment of each post.
