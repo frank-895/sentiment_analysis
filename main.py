@@ -36,7 +36,7 @@ def retrieve_posts(n, company):
     if (
         type(n) != int or 
         n <= 0 or 
-        n > 100 or
+        n > 500 or
         type(company) != str or 
         len(company) > 15
         ):
@@ -57,20 +57,36 @@ def retrieve_posts(n, company):
         post_info.append(post['data']['title'] + post['data']['selftext']) # for each post gather its title and text for analysis
     return post_info
 
-def perform_sentiment_analysis(post:str):
-    """Performs sentiment analysis on 'post'"""
+def perform_sentiment_analysis(posts:list[str]):
+    """Performs sentiment analysis on each post in posts, and returns the average"""
+    
+    ##NEED TO ADD PARAMETER CHECK
+    
     analyser = SentimentIntensityAnalyzer() # create analyser instance
-    sentiment = analyser.polarity_scores(post) # sentiment scores.
-    return sentiment['compound'] # compound is overall sentiment between -1 and 1. *note - possible to extract positive, negative and neutral scores too.
+    
+    avg = 0 # track sentiment scores
+    for post in posts: # find sentiment for each posts
+        sentiment = analyser.polarity_scores(post)
+        avg += sentiment['compound'] # compound is overall sentiment between -1 and 1. *note - possible to extract positive, negative and neutral scores too.
+    return avg/len(posts) # return average sentiment
 
+def read_companies():
+    """Reads in company names for sentiment analysis from text file  labbeled companies.txt"""
+    companies = 'companies.txt' # contains companies to analyse
+    with open(companies) as file:
+        company_list = file.readlines() # returns array
+    clean_company_list = []
+    for company in company_list:
+        clean_company_list.append(company.strip()) # remove newlines and extra spaces
+    
+    return clean_company_list
 
+companies = read_companies() # array of companies to analyse
 
+no_to_analyse = 100
+company_sentiments = {}
+for company in companies:
+    posts = retrieve_posts(no_to_analyse, company)
+    company_sentiments[company] = perform_sentiment_analysis(posts)
 
-pepsi_posts = retrieve_posts(500, 'pepsi')
-
-pepsi_avg = 0
-for post in pepsi_posts:
-    pepsi_avg += perform_sentiment_analysis(post)
-pepsi_avg = pepsi_avg/len(pepsi_posts)
-
-print("pepsi average is: ", pepsi_avg)
+print(company_sentiments)
