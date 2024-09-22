@@ -36,17 +36,18 @@ def retrieve_posts(n, company):
     if (
         type(n) != int or 
         n <= 0 or 
-        n > 500 or
+        n > 100 or
         type(company) != str or 
-        len(company) > 15
+        len(company) > 30
         ):
         raise ValueError("Ensure inputs are correctly formatted.")
     
     # Define variables
     url = "https://oauth.reddit.com/search"
     params = {
-        'q': company, # query
+        'q': f'{company} subreddit:unitedkingdom', # query
         'limit': n, # number of queries
+        'nsfw':'no'
     }
     headers = get_headers() # get access to API
 
@@ -57,17 +58,21 @@ def retrieve_posts(n, company):
         post_info.append(post['data']['title'] + post['data']['selftext']) # for each post gather its title and text for analysis
     return post_info
 
-def perform_sentiment_analysis(posts:list[str]):
+def perform_sentiment_analysis(posts:list[str], company:str):
     """Performs sentiment analysis on each post in posts, and returns the average"""
-    
-    ##NEED TO ADD PARAMETER CHECK
     
     analyser = SentimentIntensityAnalyzer() # create analyser instance
     
     avg = 0 # track sentiment scores
+    failed = 0
     for post in posts: # find sentiment for each posts
-        sentiment = analyser.polarity_scores(post)
-        avg += sentiment['compound'] # compound is overall sentiment between -1 and 1. *note - possible to extract positive, negative and neutral scores too.
+        if (company.lower() in post.lower()):
+            sentiment = analyser.polarity_scores(post)
+            avg += sentiment['compound'] # compound is overall sentiment between -1 and 1. *note - possible to extract positive, negative and neutral scores too.
+        else:
+            failed += 1
+    print('total failed for', company, ': ', failed)
+    print('total checked for', company, ': ', len(posts))
     return avg/len(posts) # return average sentiment
 
 def read_companies():
@@ -78,7 +83,6 @@ def read_companies():
     clean_company_list = []
     for company in company_list:
         clean_company_list.append(company.strip()) # remove newlines and extra spaces
-    
     return clean_company_list
 
 companies = read_companies() # array of companies to analyse
@@ -87,6 +91,11 @@ no_to_analyse = 100
 company_sentiments = {}
 for company in companies:
     posts = retrieve_posts(no_to_analyse, company)
-    company_sentiments[company] = perform_sentiment_analysis(posts)
+    company_sentiments[company] = perform_sentiment_analysis(posts, company)
 
+# find baseline sentiment for word 'supermarket'
+posts = retrieve_posts(no_to_analyse, 'supermarket')
+baseline_sentiment = perform_sentiment_analysis(posts, 'supermarket')
+
+print("Baseline sentiment: ", baseline_sentiment)
 print(company_sentiments)
