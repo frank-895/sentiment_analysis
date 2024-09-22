@@ -1,4 +1,4 @@
-## Sentiment Analysis of UK Supermarkets on Reddit
+##Sentiment Analysis of UK Supermarkets on Reddit
 
 **Overview**
 
@@ -64,6 +64,24 @@ This chart shows how the sentiment for each supermarket compares to the average 
 
 This chart shows the number of Reddit posts analyzed for each supermarket. It indicates how much data was available, which can influence the sentiment scores due to sample size variability.
 
+**Results**
+
+*Sentiment Deviation from Baseline*
+The first plot visualizes how the sentiment for each supermarket deviates from the baseline sentiment of the general term "supermarket." A positive deviation suggests that the supermarket has a more favorable public sentiment compared to the overall sentiment for supermarkets, while a negative deviation suggests a less favorable sentiment.
+
+Key Findings:
+- Aldi, Lidl, and Iceland have positive sentiment deviations, indicating they are perceived more favorably than the average supermarket.
+- Tesco has the most negative sentiment deviation, suggesting it is viewed less favorably compared to the baseline.
+- ASDA and Sainsbury also exhibit slightly negative sentiment deviations, though not as pronounced as Tesco.
+
+*Sample Size of Posts Analysed*
+The second plot displays the number of Reddit posts analyzed for each supermarket. This is important to assess how representative the sentiment scores are, as supermarkets with a larger sample size might have more reliable sentiment data.
+
+Key Findings:
+- Tesco has the highest number of posts analyzed (around 100), which means its sentiment score is based on more data and may be more reliable.
+- Lidl has the smallest sample size (around 70 posts), which means the sentiment score may be less reliable due to fewer data points.
+- Most supermarkets have between 80 and 100 posts analyzed, giving a reasonable range of sentiment data across the dataset.
+
 **Limitations**
 
 - Reddit API Limitations:The Reddit API limits post retrieval to 100 per query, which constrains the data available for sentiment analysis. Additionally, the API does not support retrieving historical data, preventing analysis of sentiment trends over time.
@@ -79,6 +97,7 @@ This chart shows the number of Reddit posts analyzed for each supermarket. It in
 - Plotting Data: I learned to use matplotlib and seaborn to visualize data effectively, which is crucial for interpreting results and presenting findings.
 
 **Potential Improvements and Future Work**
+
 - Incorporating More Data: The project would benefit from accessing a larger dataset. This could be achieved by scraping multiple sources or finding a way to bypass the Reddit API's 100-post limit.
 - Sentiment Over Time: A future improvement would involve plotting sentiment trends over time, giving insight into how public opinion of supermarkets changes over months or years. This would require API support for historical data, which is currently lacking.
 - Query Refinement: Improving the relevance of posts by refining queries (e.g., by using advanced filtering or including/excluding certain subreddits) would enhance the quality of the dataset, ensuring the posts analyzed are truly relevant to the supermarket in question.
