@@ -1,4 +1,4 @@
-##Sentiment Analysis of UK Supermarkets on Reddit
+## Sentiment Analysis of UK Supermarkets on Reddit
 
 **Overview**
 
