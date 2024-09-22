@@ -54,19 +54,8 @@ plt.show()
 
 **Results**
 
-The results reveal deviations in sentiment for each supermarket compared to the baseline. The sentiment data is visualized in two main graphs:
-
-*Deviation from Baseline Sentiment:*
-
-This chart shows how the sentiment for each supermarket compares to the average sentiment for the general term "supermarket." Supermarkets like Aldi and Lidl show positive deviations, suggesting they are viewed more favorably, while Tesco and Sainsbury demonstrate negative deviations.
-
-*Sample Size for Each Supermarket:*
-
-This chart shows the number of Reddit posts analyzed for each supermarket. It indicates how much data was available, which can influence the sentiment scores due to sample size variability.
-
-**Results**
-
 *Sentiment Deviation from Baseline*
+
 The first plot visualizes how the sentiment for each supermarket deviates from the baseline sentiment of the general term "supermarket." A positive deviation suggests that the supermarket has a more favorable public sentiment compared to the overall sentiment for supermarkets, while a negative deviation suggests a less favorable sentiment.
 
 Key Findings:
@@ -75,6 +64,7 @@ Key Findings:
 - ASDA and Sainsbury also exhibit slightly negative sentiment deviations, though not as pronounced as Tesco.
 
 *Sample Size of Posts Analysed*
+
 The second plot displays the number of Reddit posts analyzed for each supermarket. This is important to assess how representative the sentiment scores are, as supermarkets with a larger sample size might have more reliable sentiment data.
 
 Key Findings:
