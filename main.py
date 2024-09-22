@@ -3,7 +3,9 @@ from requests.auth import HTTPBasicAuth
 import os
 from dotenv import load_dotenv
 from vaderSentiment.vaderSentiment import SentimentIntensityAnalyzer
-from datetime import datetime
+import pandas as pd
+import matplotlib.pyplot as plt
+import seaborn as sns
 
 def get_headers():
     """Retrieve Reddit API headers to access Reddit data."""
@@ -26,12 +28,10 @@ def get_headers():
 
 def retrieve_posts(n, company):
     """
-    Retrieves n reddit posts containing name of company from start_date to end_date. 
+    Retrieves n reddit posts containing name of company. 
     n should be integer between 1 and 100 (inclusive)
     company should be string no greater than 15 characters
-    Dates should be supplied in format 'YYYY-MM-DD'
     """
-    
     # validate inputs
     if (
         type(n) != int or 
@@ -59,43 +59,41 @@ def retrieve_posts(n, company):
     return post_info
 
 def perform_sentiment_analysis(posts:list[str], company:str):
-    """Performs sentiment analysis on each post in posts, and returns the average"""
+    """Performs sentiment analysis on each post in posts. Returns the average sentiment and number of posts used for analysis in tuple."""
     
     analyser = SentimentIntensityAnalyzer() # create analyser instance
     
     avg = 0 # track sentiment scores
     failed = 0
     for post in posts: # find sentiment for each posts
-        if (company.lower() in post.lower()):
-            sentiment = analyser.polarity_scores(post)
+        if (company.lower() in post.lower()): # This is a bit inefficient, limited by results from reddit API
+            sentiment = analyser.polarity_scores(post) # perform sentiment analysis with VADER
             avg += sentiment['compound'] # compound is overall sentiment between -1 and 1. *note - possible to extract positive, negative and neutral scores too.
         else:
             failed += 1
-    print('total failed for', company, ': ', failed)
-    print('total checked for', company, ': ', len(posts))
-    return avg/len(posts) # return average sentiment
+    
+    return (avg/len(posts), len(posts) - failed) # return average sentiment and number of posts checked in tuple
 
-def read_companies():
-    """Reads in company names for sentiment analysis from text file  labbeled companies.txt"""
-    companies = 'companies.txt' # contains companies to analyse
-    with open(companies) as file:
-        company_list = file.readlines() # returns array
-    clean_company_list = []
-    for company in company_list:
-        clean_company_list.append(company.strip()) # remove newlines and extra spaces
-    return clean_company_list
-
-companies = read_companies() # array of companies to analyse
-
-no_to_analyse = 100
-company_sentiments = {}
-for company in companies:
-    posts = retrieve_posts(no_to_analyse, company)
-    company_sentiments[company] = perform_sentiment_analysis(posts, company)
+companies = [] # stores company names
+with open('companies.txt', 'r') as file: # read in company names for sentiment analysis
+        companies = [company.strip() for company in file.readlines()]
 
 # find baseline sentiment for word 'supermarket'
+no_to_analyse = 100 # 100 is max no. of posts that can be scraped with reddit API
 posts = retrieve_posts(no_to_analyse, 'supermarket')
-baseline_sentiment = perform_sentiment_analysis(posts, 'supermarket')
+baseline_sentiment, _ = perform_sentiment_analysis(posts, 'supermarket')
 
-print("Baseline sentiment: ", baseline_sentiment)
-print(company_sentiments)
+df = pd.DataFrame(columns=['Supermarket', 'Sentiment', 'Deviation', 'n'])
+for company in companies:
+    posts = retrieve_posts(no_to_analyse, company) # retrieve posts for sentiment analysis
+    sentiment, n = perform_sentiment_analysis(posts, company) # for each company attain avg sentiment score
+    df.loc[len(df)] = {'Supermarket':company, 'Sentiment': sentiment, 'Deviation': sentiment - baseline_sentiment, 'n':n} # insert relevant stats into df
+df = df.sort_values(by='Deviation', ascending=True) # sort dataframe
+
+plt.figure(figsize=(12,8))
+sns.barplot(x='Supermarket', y='Deviation', data=df)
+plt.xlabel('Supermarket')
+plt.ylabel('Sentiment Deviation from Baseline')
+plt.title('Deviation from Baseline Sentiment for UK Supermarkets')
+plt.xticks(rotation=45)
+plt.show()
