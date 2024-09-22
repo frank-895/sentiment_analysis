@@ -90,10 +90,21 @@ for company in companies:
     df.loc[len(df)] = {'Supermarket':company, 'Sentiment': sentiment, 'Deviation': sentiment - baseline_sentiment, 'n':n} # insert relevant stats into df
 df = df.sort_values(by='Deviation', ascending=True) # sort dataframe
 
+# Plot deviation from baseline sentiment for each supermarket
 plt.figure(figsize=(12,8))
 sns.barplot(x='Supermarket', y='Deviation', data=df)
 plt.xlabel('Supermarket')
 plt.ylabel('Sentiment Deviation from Baseline')
 plt.title('Deviation from Baseline Sentiment for UK Supermarkets')
+plt.xticks(rotation=45)
+plt.show()
+
+# Plot sample size for each supermarket
+df = df.sort_values(by='n', ascending=True)
+plt.figure(figsize=(12,8))
+sns.barplot(x='Supermarket', y='n', data=df)
+plt.xlabel('Supermarket')
+plt.ylabel('Sample Size')
+plt.title('Number of Posts Sentiment Analysed for Each Supermarket')
 plt.xticks(rotation=45)
 plt.show()
